@@ -53,7 +53,7 @@ class User extends Authenticatable
 
     public function owned_boards(): HasMany
     {
-        return $this->hasMany(Board::class, 'owner_id');
+        return $this->hasMany(Board::class);
     }
 
 
