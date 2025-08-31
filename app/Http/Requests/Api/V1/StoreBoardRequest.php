@@ -23,7 +23,7 @@ class StoreBoardRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'description' => ['text'],
+            'description' => ['string'],
             'ownerId' => ['required', 'integer', 'exists:users,id'],
         ];
     }

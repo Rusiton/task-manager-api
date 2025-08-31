@@ -67,6 +67,7 @@ class BoardController extends Controller implements HasMiddleware
         Gate::authorize('modify', $board);
 
         $validated = $request->validated();
+        
         $board->update($validated);
 
         return new BoardResource($board);

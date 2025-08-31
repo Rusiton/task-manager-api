@@ -11,7 +11,7 @@ class UpdateBoardRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -26,14 +26,14 @@ class UpdateBoardRequest extends FormRequest
         if ($method == 'PUT') {
             return [
                 'name' => ['required', 'string'],
-                'description' => ['text'],
+                'description' => ['string'],
                 'ownerId' => ['required', 'integer', 'exists:users,id'],
             ];
         }
         else {
             return [
                 'name' => ['sometimes', 'required', 'string'],
-                'description' => ['sometimes', 'text'],
+                'description' => ['sometimes', 'string'],
                 'ownerId' => ['sometimes', 'required', 'integer', 'exists:users,id'],
             ];
         }

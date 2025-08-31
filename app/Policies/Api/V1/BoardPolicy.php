@@ -10,8 +10,7 @@ class BoardPolicy
 {
     public function modify(User $user, Board $board)
     {
-        $user->id === $board->owner_id
-        ? Response::allow()
-        : Response::deny('You do not posses the perms to modify this');
+        if ($user->id == $board->owner_id) return Response::allow();
+        else return Response::deny('You do not posses the perms to make this action');
     }
 }
