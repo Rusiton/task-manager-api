@@ -19,7 +19,7 @@ class Board extends Model
     
     public function user(): BelongsTo
     {
-        return $this->BelongsTo(User::class);
+        return $this->BelongsTo(User::class, 'owner_id');
     }
 
 
