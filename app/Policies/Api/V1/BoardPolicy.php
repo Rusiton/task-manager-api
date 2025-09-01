@@ -8,9 +8,19 @@ use Illuminate\Auth\Access\Response;
 
 class BoardPolicy
 {
-    public function modify(User $user, Board $board)
+    public function show(User $user, Board $board): Response
     {
-        if ($user->id == $board->owner_id) return Response::allow();
-        else return Response::deny('You do not posses the perms to make this action');
+        return $board->users->contains($user) || $user->id === $board->owner_id
+            ? Response::allow()
+            : Response::deny('You are not allowed to get this resource');
+    }
+
+
+
+    public function modify(User $user, Board $board): Response
+    {
+        return $user->id === $board->owner_id
+            ? Response::allow()
+            : Response::deny('You do not posses the perms to modify this');
     }
 }

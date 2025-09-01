@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreBoardRequest extends FormRequest
+class StoreColumnRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,8 +23,8 @@ class StoreBoardRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'description' => ['nullable'],
-            'ownerId' => ['required', 'integer', 'exists:users,id'],
+            'boardId' => ['required', 'integer', 'exists:boards,id'],
+            'position' => ['required', 'integer'],
         ];
     }
 }

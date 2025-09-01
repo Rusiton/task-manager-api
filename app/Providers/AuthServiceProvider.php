@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\Board;
-use App\Policies\Api\V1\BoardPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -14,7 +12,8 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Board::class => BoardPolicy::class,
+        \App\Models\Board::class => \App\Policies\Api\V1\BoardPolicy::class,
+        \App\Models\Column::class => \App\Policies\Api\V1\ColumnPolicy::class,
     ];
 
     /**

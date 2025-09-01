@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('name');
             $table->integer('position');
 
+            $table->unique(['board_id', 'position']);
+
             $table->timestamps();
         });
     }

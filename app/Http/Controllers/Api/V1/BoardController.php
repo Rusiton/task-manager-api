@@ -25,20 +25,21 @@ class BoardController extends Controller implements HasMiddleware
 
 
     public function index(Request $request) {
-        $boards = $request->user()->owned_boards;
+        [$ownedBoards, $joinedBoards] = [
+            $request->user()->owned_boards, 
+            $request->user()->joined_boards
+        ];
 
-        return new BoardCollection($boards);
+        return [
+            'ownedBoards' => new BoardCollection($ownedBoards),
+            'joinedBoards' => new BoardCollection($joinedBoards)
+        ];
     }
 
 
 
     public function show(Board $board) {
-        $includeUsers = request()->query('includeUsers');
         $includeColumns = request()->query('includeColumns');
-
-        if ($includeUsers == 'true') {
-            $board = $board->loadMissing('users');
-        }
 
         if ($includeColumns == 'true') {
             $board = $board->loadMissing('columns');
@@ -80,6 +81,6 @@ class BoardController extends Controller implements HasMiddleware
 
         $board->delete();
 
-        return ['message' => 'Board deleted successfully'];
+        return ['message' => 'Board was deleted successfully'];
     }
 }

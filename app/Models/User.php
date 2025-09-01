@@ -60,7 +60,7 @@ class User extends Authenticatable
 
     public function joined_boards(): BelongsToMany
     {
-        return $this->belongsToMany(Board::class);
+        return $this->belongsToMany(Board::class)->withPivot('role');
     }
 
     

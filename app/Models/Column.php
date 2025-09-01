@@ -9,10 +9,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Column extends Model
 {
     protected $fillable = [
-        'board_id',
         'name',
         'position',
     ];
+
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($column) {
+            if ($column->isDirty('board_id')) {
+                throw new \Exception('Cannot move column to different board');
+            }
+        }) ;
+    }
 
 
     

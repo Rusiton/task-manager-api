@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreBoardRequest extends FormRequest
+class UpdateColumnRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,10 +21,19 @@ class StoreBoardRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => ['required', 'string'],
-            'description' => ['nullable'],
-            'ownerId' => ['required', 'integer', 'exists:users,id'],
-        ];
+        $method = request()->method();
+
+        if ($method == 'PUT') {
+            return [
+                'name' => ['required', 'string'],
+                'position' => ['required', 'integer'],
+            ];
+        }
+        else {
+            return [
+                'name' => ['sometimes', 'required', 'string'],
+                'position' => ['sometimes', 'required', 'integer'],
+            ];
+        }
     }
 }
