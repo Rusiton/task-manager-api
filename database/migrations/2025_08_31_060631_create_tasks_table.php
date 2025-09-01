@@ -20,6 +20,8 @@ return new class extends Migration
             $table->text('description');
             $table->integer('position');
             $table->date('due_date')->nullable();
+            
+            $table->unique(['column_id', 'position']);
 
             $table->timestamps();
         });

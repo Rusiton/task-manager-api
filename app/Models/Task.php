@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Task extends Model
 {
     protected $fillable = [
-        'list_id',
+        'column_id',
         'assigned_to',
         'name',
         'description',
