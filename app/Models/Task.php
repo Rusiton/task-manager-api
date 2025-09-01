@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Interfaces\Commentable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-class Task extends Model
+class Task extends Model implements Commentable
 {
     protected $fillable = [
         'column_id',
@@ -16,6 +17,13 @@ class Task extends Model
         'position',
         'due_date',
     ];
+
+
+
+    public function getBoard(): ?Board
+    {
+        return $this->column->board;
+    }
 
 
 
@@ -33,8 +41,8 @@ class Task extends Model
 
 
 
-    public function comments(): HasMany
+    public function comments(): MorphMany
     {
-        return $this->hasMany(Comment::class);
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }

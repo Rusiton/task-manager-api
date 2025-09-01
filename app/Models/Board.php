@@ -24,6 +24,13 @@ class Board extends Model
 
 
 
+    public function admins(): BelongsToMany
+    {
+        return $this->users()->wherePivot('role', 'admin');
+    }
+
+
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withPivot('role');

@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Interfaces\Commentable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Column extends Model
+class Column extends Model implements Commentable
 {
     protected $fillable = [
         'name',
@@ -24,6 +25,13 @@ class Column extends Model
                 throw new \Exception('Cannot move column to different board');
             }
         }) ;
+    }
+
+
+
+    public function getBoard(): ?Board
+    {
+        return $this->board;
     }
 
 

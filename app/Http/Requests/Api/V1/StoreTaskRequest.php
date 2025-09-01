@@ -23,11 +23,11 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'columnId' => ['required', 'integer', 'exists:columns,id'],
-            'assignedTo' => ['required', 'integer', 'exists:users,id'],
+            'assignedTo' => ['nullable', 'integer', 'exists:users,id'],
             'name' => ['required', 'string'],
             'description' => ['nullable'],
             'position' => ['required', 'integer'],
-            'dueDate' => ['required', 'date'],
+            'dueDate' => ['nullable', 'date'],
         ];
     }
 }

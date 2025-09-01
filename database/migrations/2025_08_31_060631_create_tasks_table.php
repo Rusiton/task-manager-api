@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('column_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('assigned_to')->nullable()->constrained('users', 'id')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->integer('position');
             $table->date('due_date')->nullable();
             

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\BoardController;
 use App\Http\Controllers\Api\V1\ColumnController;
+use App\Http\Controllers\Api\V1\CommentController;
 use App\Http\Controllers\Api\V1\TaskController;
 use App\Http\Controllers\Auth\V1\AuthenticationController;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
     Route::apiResource('boards', BoardController::class);
     Route::apiResource('columns', ColumnController::class);
     Route::apiResource('tasks', TaskController::class);
+    Route::apiResource('comments', CommentController::class);
 });
 
 Route::group(['prefix' => 'auth', 'namespace' => 'App\Http\Controllers\Auth\V1'], function () {

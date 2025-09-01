@@ -4,20 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Comment extends Model
 {
     protected $fillable = [
-        'task_id',
         'user_id',
         'content',
     ];
 
 
 
-    public function task(): BelongsTo
+    public function commentable(): MorphTo
     {
-        return $this->belongsTo(Task::class);
+        return $this->morphTo();
     }
 
 

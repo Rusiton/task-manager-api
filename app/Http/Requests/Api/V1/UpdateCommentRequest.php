@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateBoardRequest extends FormRequest
+class UpdateCommentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,26 +25,13 @@ class UpdateBoardRequest extends FormRequest
 
         if ($method == 'PUT') {
             return [
-                'name' => ['required', 'string'],
-                'description' => ['string'],
-                'owner_id' => ['required', 'integer', 'exists:users,id'],
+                'content' => ['required', 'string'],
             ];
         }
         else {
             return [
-                'name' => ['sometimes', 'required', 'string'],
-                'description' => ['sometimes', 'string'],
-                'owner_id' => ['sometimes', 'required', 'integer', 'exists:users,id'],
+                'content' => ['sometimes', 'required', 'string'],
             ];
         }
-    }
-
-
-
-    protected function prepareForValidation()
-    {
-        return $this->merge([
-            'owner_id' => $this->ownerId,
-        ]);
     }
 }
