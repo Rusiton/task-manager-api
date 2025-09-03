@@ -17,7 +17,7 @@ class AuthenticationController extends Controller
      * Gets the current user
      */
     public function user(Request $request) {
-        return $request->user();
+        return new UserResource($request->user());
     }
 
     /**

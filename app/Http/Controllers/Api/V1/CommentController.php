@@ -23,6 +23,13 @@ class CommentController extends Controller implements HasMiddleware
 
 
 
+    public function index(Request $request) {
+        $comments = $request->user()->comments;
+        return CommentResource::collection($comments);
+    }
+
+
+
     public function show(Comment $comment) {
         return new CommentResource($comment);
     }

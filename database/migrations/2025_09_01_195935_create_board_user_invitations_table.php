@@ -11,15 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('board_user', function (Blueprint $table) {
+        Schema::create('board_user_invitations', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('board_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('role');
-            $table->timestamp('joined_at');
+            $table->foreignId('invited_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+
+            $table->string('token')->unique();
+            $table->enum('status', ['pending', 'accepted', 'declined', 'expired'])->default('pending');
+            $table->timestamp('expires_at');
 
             $table->timestamps();
+
+            $table->unique(['board_id', 'user_id']);
         });
     }
 
@@ -28,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('board_user');
+        Schema::dropIfExists('board_user_invitations');
     }
 };

@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreBoardRequest extends FormRequest
+class InviteUserBoardRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,9 @@ class StoreBoardRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'description' => ['nullable'],
+            'boardId' => ['required', 'integer', 'exists:boards,id'],
+            'userId' => ['required', 'integer', 'exists:users,id'],
+            'expiresAt' => ['required', 'date'],
         ];
     }
 }

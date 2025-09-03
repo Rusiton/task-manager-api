@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Traits\HasToken;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasToken;
 
     /**
      * The attributes that are mass assignable.
@@ -75,5 +77,19 @@ class User extends Authenticatable
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+
+
+    public function recievedInvitations(): HasMany
+    {
+        return $this->hasMany(BoardUserInvitation::class);
+    }
+
+
+
+    public function sentInvitations(): HasMany
+    {
+        return $this->hasMany(BoardUserInvitation::class, 'invited_by');
     }
 }

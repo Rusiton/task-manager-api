@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreColumnRequest;
 use App\Http\Requests\Api\V1\UpdateColumnRequest;
-use App\Http\Resources\Api\V1\ColumnCollection;
 use App\Http\Resources\Api\V1\ColumnResource;
 use App\Models\Board;
 use App\Models\Column;
@@ -34,7 +33,7 @@ class ColumnController extends Controller implements HasMiddleware
 
         Gate::authorize('show', [Column::class, $board]);
 
-        return new ColumnCollection($board->columns);
+        return ColumnResource::collection($board->columns);
     }
 
 

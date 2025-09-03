@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Http\Resources\Auth\V1\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,12 +17,13 @@ class BoardResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'token' => $this->token,
             'name' => $this->name,
             'description' => $this->description,
-            'ownerId' => $this->owner_id,
-            'members' => $this->users,
-            'columns' => new ColumnCollection($this->whenLoaded('columns')),
+            'owner' => new UserResource(User::find($this->owner_id)),
+            'admins' => UserResource::collection($this->admins),
+            'members' => UserResource::collection($this->users),
+            'lists' => ColumnResource::collection($this->columns),
         ];
     }
 }

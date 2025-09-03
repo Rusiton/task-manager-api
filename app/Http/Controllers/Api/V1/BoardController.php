@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\InviteUserBoardRequest;
 use App\Http\Requests\Api\V1\StoreBoardRequest;
 use App\Http\Requests\Api\V1\UpdateBoardRequest;
-use App\Http\Resources\Api\V1\BoardCollection;
 use App\Http\Resources\Api\V1\BoardResource;
+use App\Http\Resources\Api\V1\BoardInvitationResource;
 use App\Models\Board;
+use App\Models\BoardUserInvitation;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -23,6 +25,12 @@ class BoardController extends Controller implements HasMiddleware
     }
 
 
+    /**
+     * 
+     * Standard CRUD action
+     * 
+     */
+
 
     public function index(Request $request) {
         [$ownedBoards, $joinedBoards] = [
@@ -31,20 +39,16 @@ class BoardController extends Controller implements HasMiddleware
         ];
 
         return [
-            'ownedBoards' => new BoardCollection($ownedBoards),
-            'joinedBoards' => new BoardCollection($joinedBoards)
+            'ownedBoards' => BoardResource::collection($ownedBoards),
+            'joinedBoards' => BoardResource::collection($joinedBoards)
         ];
     }
 
 
 
     public function show(Board $board) {
-        $includeColumns = request()->query('includeColumns');
-
-        if ($includeColumns == 'true') {
-            $board = $board->loadMissing('columns');
-        }
-
+        Gate::authorize('show', $board);
+        
         return new BoardResource($board);
     }
 
@@ -56,7 +60,7 @@ class BoardController extends Controller implements HasMiddleware
         $board = $request->user()->owned_boards()->create([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'owner_id' => $validated['ownerId'],
+            'owner_id' => $request->user()->id,
         ]);
 
         return new BoardResource($board);
@@ -83,4 +87,153 @@ class BoardController extends Controller implements HasMiddleware
 
         return ['message' => 'Board was deleted successfully'];
     }
+
+
+    /**
+     * 
+     * User-Board related actions.
+     * 
+     */
+
+    /**
+     * Invite a user to a board.
+     */
+    public function inviteUser(Board $board, InviteUserBoardRequest $request) {
+        $validated = $request->validated();
+
+        Gate::authorize('manageInvitations', [BoardUserInvitation::class, $board]);
+
+        if(BoardUserInvitation::where('board_id', $board->id)
+            ->where('user_id', $validated['userId'])
+            ->where('status', 'pending')
+            ->where('expires_at', '>', now())
+            ->exists())
+            {
+                return response()->json([
+                    'message' => 'An invitation to this board has already been sent to this user',
+                ], 422);
+            }
+        
+        Gate::authorize('invite', [BoardUserInvitation::class, $board]);
+        
+        $expiredOrDeclinedInvitation = BoardUserInvitation::where('board_id', $board->id)
+            ->where('user_id', $validated['userId'])
+            ->where('status', ['declined', 'expired'])
+            ->first();
+
+        if ($expiredOrDeclinedInvitation) $expiredOrDeclinedInvitation->delete();
+
+        $request->user()->sentInvitations()->create([
+            'board_id' => $validated['boardId'],
+            'user_id' => $validated['userId'],
+            'invited_by' => $request->user()->id,
+            'status' => 'pending',
+            'expires_at' => $request['expiresAt'],
+            // Token is automatically generated during creation within the BoardUserInvitation model
+        ]);
+
+        return response()->json([
+            'message' => 'Invitation was sent successfully',
+        ]);
+    }
+
+    /**
+     * Cancel an already sent invitation
+     */
+    public function cancelInvitation(Board $board, BoardUserInvitation $invitation) {
+        Gate::authorize('manageInvitations', [BoardUserInvitation::class, $invitation->board]);
+
+        if ($invitation->board_id !== $board->id) {
+            return response()->json(['message' => 'Invitation does not belong to this board'], 422);
+        }
+
+        if (!$invitation->isPending()) {
+            return response()->json(['message' => 'Can only cancel pending invitations'], 422);
+        }
+
+        $invitation->delete();
+
+        return response()->json([
+            'message' => 'Invitation was cancelled successfully',
+        ]);
+    }
+
+    /**
+     * Get invitation details.
+     */
+    public function showInvitation(BoardUserInvitation $invitation) {
+        Gate::authorize('show', [BoardUserInvitation::class, $invitation]);
+        return new BoardInvitationResource($invitation);
+    }
+
+    /**
+     * Accept an invitation.
+     */
+    public function acceptInvitation(BoardUserInvitation $invitation) {
+        Gate::authorize('accept', [BoardUserInvitation::class, $invitation]);
+
+        $invitation->board->users()->attach(
+            request()->user()->id, 
+            [
+            'board_id' => $invitation->board->id,
+            'user_id' => request()->user()->id,
+            'role' => 'member',
+            'joined_at' => now(),
+        ]);
+
+        $invitation->update(['status' => 'accepted']);
+
+        return response()->json([
+            'message' => 'Invitation was accepted successfully',
+            'board' => new BoardResource($invitation->board),
+        ]);
+    }
+
+    /**
+     * Decline an invitation.
+     */
+    public function declineInvitation(BoardUserInvitation $invitation) {
+        Gate::authorize('decline', [BoardUserInvitation::class, $invitation]);
+
+        $invitation->update(['status' => 'declined']);
+
+        return response()->json([
+            'message' => 'Invitation was declined successfully',
+        ]);
+    }
+
+    /**
+     * Get all the invitations of a board. For invitation management purposes only.
+     */
+    public function getBoardInvitations(Board $board) {
+        Gate::authorize('manageInvitations', [BoardUserInvitation::class, $board]);
+        return BoardInvitationResource::collection($board->invitations);
+    }
+
+    /**
+     * Get all the invitations of a board. For invitation management purposes only.
+     */
+    public function getUserInvitations(Request $request) {
+        $request->query('sent') == 'true' 
+            ? $invitations = $request->user()->sentInvitations
+            : $invitations = $request->user()->recievedInvitations;
+
+        return BoardInvitationResource::collection($invitations);
+    }
+
+    /**
+     * Leave a board.
+     */
+    public function leaveBoard(Board $board) {
+        Gate::authorize('leave', [BoardUserInvitation::class, $board]);
+
+        $board->users()->detach(
+            request()->user()->id
+        );
+
+        return response()->json([
+            'message' => 'Left board successfully',
+        ]);
+    }
+
 }

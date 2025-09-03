@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreTaskRequest;
 use App\Http\Requests\Api\V1\UpdateTaskRequest;
-use App\Http\Resources\Api\V1\TaskCollection;
 use App\Http\Resources\Api\V1\TaskResource;
-use App\Models\Board;
 use App\Models\Column;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -35,7 +33,7 @@ class TaskController extends Controller implements HasMiddleware
 
         Gate::authorize('show', [Task::class, $column->board]);
 
-        return new TaskCollection($column->tasks);
+        return TaskResource::collection($column->tasks);
     }
 
     

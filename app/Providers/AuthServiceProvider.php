@@ -16,6 +16,7 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\Column::class => \App\Policies\Api\V1\ColumnPolicy::class,
         \App\Models\Task::class => \App\Policies\Api\V1\TaskPolicy::class,
         \App\Models\Comment::class => \App\Policies\Api\V1\CommentPolicy::class,
+        \App\Models\BoardUserInvitation::class => \App\Policies\Api\V1\BoardInvitationPolicy::class,
     ];
 
     /**
