@@ -26,6 +26,8 @@ class UserResource extends JsonResource
             'token' => $this->token,
             'name' => $this->name,
             'email' => $this->email,
+            'profile' => new UserProfileResource($this->profile),
+            'settings' => new UserSettingsResource($this->settings),
         ];
 
         if (!empty($this->accessToken)) {

@@ -19,6 +19,13 @@ class Board extends Model
     ];
 
 
+
+    public function getRouteKeyName()
+    {
+        return 'token'; 
+    }
+
+
     
     public function user(): BelongsTo
     {

@@ -22,6 +22,25 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        Schema::create('user_profiles', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('name')->nullable();
+            $table->text('description')->nullable();
+
+            $table->timestamps();
+        });
+
+        Schema::create('user_settings', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->enum('theme', ['light', 'dark'])->default('light');
+            
+            $table->timestamps();
+        });
+
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
@@ -44,6 +63,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('users');
+        Schema::dropIfExists('user_profile');
+        Schema::dropIfExists('user_settings');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }

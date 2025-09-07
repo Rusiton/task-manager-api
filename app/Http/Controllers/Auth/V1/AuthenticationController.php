@@ -9,24 +9,33 @@ use App\Http\Resources\Auth\V1\UserResource;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthenticationController extends Controller
 {
-    /**
-     * Gets the current user
-     */
-    public function user(Request $request) {
-        return new UserResource($request->user());
-    }
-
     /**
      * Register a new user 
      */
     public function register(UserRegisterRequest $request) {
         $validatedData = $request->validated();
 
-        $user = User::create($validatedData);
+        $user = DB::transaction(function () use ($validatedData) {
+            $user = User::create($validatedData);
+
+            $user->profile()->create([
+                'name' => null,
+            ]);
+
+            $user->settings()->create([
+                'theme' => 'light',
+            ]);
+
+            $user->load(['profile', 'settings']);
+
+            return $user;
+        });
+
 
         $currentTimestamp = Carbon::now();
         $token = $user->createToken("$request->name\\_$currentTimestamp");

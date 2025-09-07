@@ -23,11 +23,6 @@ trait HasToken
         
         return $token;
     }
-    
-    public function getRouteKeyName()
-    {
-        return 'token'; // Use token instead of id for route model binding
-    }
 }
 
 ?>
