@@ -26,14 +26,14 @@ class UpdateUserRequest extends FormRequest
 
         if ($http_method === 'PUT') {
             return [
-                'name' => ['required'],
+                'name' => ['required', 'unique:users'],
                 'email' => ['required', 'email', Rule::unique('users')->ignore($this->user->id, 'id')],
                 'password' => ['required'],
             ];
         } 
         else {
             return [
-                'name' => ['sometimes', 'required'],
+                'name' => ['sometimes', 'required', 'unique:users'],
                 'email' => ['sometimes', 'required', 'email', Rule::unique('users')->ignore($this->user->id, 'id')],
                 'password' => ['sometimes', 'required'],
             ];
