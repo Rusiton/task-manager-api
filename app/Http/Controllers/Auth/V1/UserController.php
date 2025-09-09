@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\V1\UpdateUserProfileRequest;
 use App\Http\Requests\Auth\V1\UpdateUserRequest;
 use App\Http\Requests\Auth\V1\UpdateUserSettingsRequest;
+use App\Http\Resources\Api\V1\BoardResource;
 use App\Http\Resources\Auth\V1\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -29,8 +30,17 @@ class UserController extends Controller implements HasMiddleware
 
 
 
-    public function show(User $user) {
-        return new UserResource($user);
+    public function show($searchParam) {
+        $user = User::where('name', $searchParam)->first();
+
+        if (!$user) {
+            // Tries to search by token if search by name failed.
+            $user = User::where('token', $searchParam)->first();
+        }
+
+        return $user 
+            ? new UserResource($user)
+            : response()->json(['message' => 'The requested instance could not be found.'], 404);
     }
 
 
@@ -75,5 +85,19 @@ class UserController extends Controller implements HasMiddleware
         return response()->json([
             'message' => 'User deleted successfully',
         ]);
+    }
+
+
+
+    public function getBoards(User $user) {
+        [$ownedBoards, $joinedBoards] = [
+            $user->owned_boards, 
+            $user->joined_boards
+        ];
+
+        return [
+            'ownedBoards' => BoardResource::collection($ownedBoards),
+            'joinedBoards' => BoardResource::collection($joinedBoards)
+        ];
     }
 }

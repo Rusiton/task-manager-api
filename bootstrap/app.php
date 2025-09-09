@@ -28,6 +28,6 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (NotFoundHttpException $e, $request) {
-            return response()->json(['message' => 'The requested resource could not be found.'], 404);
+            return response()->json(['message' => 'The requested route could not be found.'], 404);
         });
     })->create();

@@ -124,7 +124,7 @@ class BoardController extends Controller implements HasMiddleware
         if ($expiredOrDeclinedInvitation) $expiredOrDeclinedInvitation->delete();
 
         $request->user()->sentInvitations()->create([
-            'board_id' => $validated['boardId'],
+            'board_id' => $board->id,
             'user_id' => $validated['userId'],
             'invited_by' => $request->user()->id,
             'status' => 'pending',

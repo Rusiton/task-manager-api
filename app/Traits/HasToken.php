@@ -23,6 +23,11 @@ trait HasToken
         
         return $token;
     }
+
+    public function getRouteKeyName()
+    {
+        return 'token'; 
+    }
 }
 
 ?>
