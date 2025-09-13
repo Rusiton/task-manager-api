@@ -6,6 +6,7 @@ use App\Http\Resources\Auth\V1\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class BoardResource extends JsonResource
 {
@@ -19,6 +20,7 @@ class BoardResource extends JsonResource
         return [
             'token' => $this->token,
             'name' => $this->name,
+            'slug' => Str::slug($this->name),
             'description' => $this->description,
             'owner' => new UserResource(User::find($this->owner_id)),
             'admins' => UserResource::collection($this->admins),

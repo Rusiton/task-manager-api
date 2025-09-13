@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
+            $table->string('token');
 
             $table->foreignId('column_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('assigned_to')->nullable()->constrained('users', 'id')->cascadeOnUpdate()->cascadeOnDelete();

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('columns', function (Blueprint $table) {
             $table->id();
+            $table->string('token');
 
             $table->foreignId('board_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');

@@ -23,7 +23,7 @@ class StoreColumnRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'boardId' => ['required', 'integer', 'exists:boards,id'],
+            'boardToken' => ['required', 'exists:boards,token'],
             'position' => ['required', 'integer'],
         ];
     }

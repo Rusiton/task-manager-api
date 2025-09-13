@@ -15,10 +15,10 @@ class ColumnResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'token' => $this->token,
             'name' => $this->name,
-            'boardId' => $this->board_id,
             'position' => $this->position,
+            'tasks' => TaskResource::collection($this->tasks),
         ];
     }
 }

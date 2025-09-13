@@ -49,7 +49,7 @@ class ColumnController extends Controller implements HasMiddleware
     public function store(StoreColumnRequest $request) {
         $validated = $request->validated();
 
-        $board = Board::find($validated['boardId']);
+        $board = Board::where('token', $validated['boardToken'])->first();
 
         Gate::authorize('create', [Column::class, $board]);
 

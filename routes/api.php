@@ -27,7 +27,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
     Route::apiResource('comments', CommentController::class);
 });
 
-Route::group(['prefix' => 'auth', 'namespace' => 'App\Http\Controllers\Auth\V1'], function () {
+Route::group(['prefix' => 'v1/auth', 'namespace' => 'App\Http\Controllers\Auth\V1'], function () {
 
     Route::apiResource('users', UserController::class);
 

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
+            $table->string('token');
 
             $table->unsignedBigInteger('commentable_id');
             $table->string('commentable_type');
