@@ -13,6 +13,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
     Route::get('boards/invitations', [BoardController::class, 'getUserInvitations']);
     Route::get('boards/invitations/{invitationToken}', [BoardController::class, 'showInvitation']);
     Route::get('boards/{boardToken}/invitations', [BoardController::class, 'getBoardInvitations']);
+
+    Route::patch('tasks/swapPositions', [TaskController::class, 'swapPositions']);
     
     Route::post('boards/{boardToken}/invitations', [BoardController::class, 'inviteUser']);
     Route::post('boards/invitations/{invitationToken}/accept', [BoardController::class, 'acceptInvitation']);

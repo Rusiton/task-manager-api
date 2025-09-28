@@ -22,8 +22,8 @@ class StoreTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'columnId' => ['required', 'integer', 'exists:columns,id'],
-            'assignedTo' => ['nullable', 'integer', 'exists:users,id'],
+            'columnToken' => ['required', 'exists:columns,token'],
+            'assignedTo' => ['nullable', 'exists:users,token'],
             'name' => ['required', 'string'],
             'description' => ['nullable'],
             'position' => ['required', 'integer'],

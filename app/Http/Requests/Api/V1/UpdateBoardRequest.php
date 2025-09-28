@@ -27,14 +27,14 @@ class UpdateBoardRequest extends FormRequest
             return [
                 'name' => ['required', 'string'],
                 'description' => ['string'],
-                'owner_id' => ['required', 'integer', 'exists:users,id'],
+                'owner_token' => ['required', 'exists:users,token'],
             ];
         }
         else {
             return [
                 'name' => ['sometimes', 'required', 'string'],
                 'description' => ['sometimes', 'string'],
-                'owner_id' => ['sometimes', 'required', 'integer', 'exists:users,id'],
+                'owner_token' => ['sometimes', 'required', 'exists:users,token'],
             ];
         }
     }

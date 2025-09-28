@@ -17,10 +17,10 @@ class BoardInvitationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'boardId' => $this->board_id,
-            'userId' => $this->user_id,
-            'invitedBy' => new UserResource(User::find($this->invited_by)),
-            'invitation_url' => "invitations/{$this->token}",
+            'token' => $this->token,
+            'board' => new BoardResource($this->board),
+            'invitedUser' => new UserResource($this->user),
+            'invitedBy' => new UserResource($this->invitedBy),
             'status' => $this->status,
             'expiresAt' => $this->expires_at,
         ];

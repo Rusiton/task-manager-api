@@ -25,34 +25,23 @@ class UpdateTaskRequest extends FormRequest
 
         if ($method == 'PUT') {
             return [
-                'column_id' => ['required', 'integer', 'exists:columns,id'],
-                'assigned_to' => ['nullable', 'integer', 'exists:users,id'],
+                'columnToken' => ['required', 'exists:columns,token'],
+                'assignedTo' => ['nullable', 'exists:users,token'],
                 'name' => ['required', 'string'],
                 'description' => ['nullable'],
                 'position' => ['required', 'integer'],
-                'due_date' => ['required', 'date'],
+                'dueDate' => ['nullable', 'date'],
             ];
         }
         else {
             return [
-                'column_id' => ['sometimes', 'required', 'integer', 'exists:columns,id'],
-                'assigned_to' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
+                'columnToken' => ['sometimes', 'required', 'exists:columns,token'],
+                'assignedTo' => ['sometimes', 'nullable', 'exists:users,token'],
                 'name' => ['sometimes', 'required', 'string'],
                 'description' => ['sometimes', 'nullable'],
-                'position' => ['sometimes', 'nullable', 'integer'],
-                'due_date' => ['sometimes', 'required', 'date'],
+                'position' => ['sometimes', 'required', 'integer'],
+                'dueDate' => ['sometimes', 'nullable', 'date'],
             ];
         }
-    }
-
-
-
-    protected function prepareForValidation()
-    {
-        return $this->merge([
-            'column_id' => $this->columnId,
-            'assigned_to' => $this->assignedTo,
-            'due_date' => $this->dueDate,
-        ]);
     }
 }

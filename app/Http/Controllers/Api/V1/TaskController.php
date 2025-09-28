@@ -8,9 +8,11 @@ use App\Http\Requests\Api\V1\UpdateTaskRequest;
 use App\Http\Resources\Api\V1\TaskResource;
 use App\Models\Column;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller implements HasMiddleware
@@ -26,10 +28,10 @@ class TaskController extends Controller implements HasMiddleware
 
     public function index(Request $request) {
         $validated = $request->validate([
-            'columnId' => ['required', 'integer', 'exists:columns,id'],
+            'columnToken' => ['required', 'exists:columns,token'],
         ]);
 
-        $column = Column::find($validated['columnId']);
+        $column = Column::where('token', $validated['columnToken'])->first();
 
         Gate::authorize('show', [Task::class, $column->board]);
 
@@ -48,13 +50,15 @@ class TaskController extends Controller implements HasMiddleware
 
     public function store(StoreTaskRequest $request) {
         $validated = $request->validated();
-        $column = Column::find($validated['columnId']); 
+
+        $column = Column::where('token', $validated['columnToken'])->first(); 
+        $assignedTo = User::where('token', $validated['assignedTo'])->first();
 
         Gate::authorize('store', [Task::class, $column->board]);
 
         $task = $column->tasks()->create([
-            'column_id' => $validated['columnId'],
-            'assigned_to' => $validated['assignedTo'],
+            'column_id' => $column->id,
+            'assigned_to' => $assignedTo ? $assignedTo->id: null,
             'name' => $validated['name'],
             'description' => $validated['description'],
             'position' => $validated['position'],
@@ -71,9 +75,53 @@ class TaskController extends Controller implements HasMiddleware
 
         Gate::authorize('modify', [Task::class, $task->column->board]);
 
-        $task->update($validated);
+        if ($validated['assignedTo']) {
+            $user = User::where('token', $validated['assignedTo'])->first();
+            $validated['assignedTo'] = $user->id; // Replaces user token by user ID
+        }
+        
+        $column = Column::where('token', $validated['columnToken'])->first();
+
+        $task->update([
+            'column_id' => $column->id,
+            'assigned_to' => $validated['assignedTo'],
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'position' => $validated['position'],
+            'due_date' => $validated['dueDate'],
+        ]);
 
         return new TaskResource($task);
+    }
+
+
+
+    public function swapPositions(Request $request){
+        $validated = $request->validate([
+            'changedTaskToken' => ['required', 'exists:tasks,token'],
+            'replacedTaskToken' => ['required', 'exists:tasks,token'],
+        ]);
+
+        DB::transaction(function () use ($validated) {
+            $changedTask = Task::where('token', $validated['changedTaskToken'])->first();
+            $replacedTask = Task::where('token', $validated['replacedTaskToken'])->first();
+
+            Gate::authorize('modify', [Task::class, $changedTask->column->board]);
+
+            $newPos = $replacedTask->position;
+
+            $changedTask->position = -1; // Temp position to avoid constraint violation.
+            $replacedTask->position = $changedTask->getOriginal('position');
+
+            $changedTask->save(); // Updates position to avoid constraint violation.
+            $replacedTask->save();
+
+            $changedTask->update(['position' => $newPos]);
+        });
+
+        return response()->json([
+            'message' => 'Positions were swapped successfully.',
+        ]);
     }
 
 
@@ -81,8 +129,15 @@ class TaskController extends Controller implements HasMiddleware
     public function destroy(Task $task) {
         Gate::authorize('modify', [Task::class, $task->column->board]);
 
+        $columnId = $task->column_id;
+        $taskPosition = $task->position;
+
         $task->delete();
 
-        return ['message' => 'Task was deleted successfully'];
+        Task::where('column_id', $columnId)
+            ->where('position', '>', $taskPosition)
+            ->decrement('position');
+
+        return response()->json(['message' => 'Task was deleted successfully']);
     }
 }

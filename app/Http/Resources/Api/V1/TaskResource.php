@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Http\Resources\Auth\V1\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,8 +17,8 @@ class TaskResource extends JsonResource
     {
         return [
             'token' => $this->token,
-            'columnId' => $this->column_id,
-            'assignedTo' => $this->assigned_to,
+            'columnToken' => $this->column->token,
+            'assignedTo' => new UserResource($this->assignedTo),
             'name' => $this->name,
             'description' => $this->description,
             'position' => $this->position,

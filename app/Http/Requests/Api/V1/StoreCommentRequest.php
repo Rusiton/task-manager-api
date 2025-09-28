@@ -25,7 +25,7 @@ class StoreCommentRequest extends FormRequest
         return [
             'commentableType' => ['required', 'string', Rule::in(['Column', 'Task'])],
             'commentableId' => ['required', 'integer'],
-            'userId' => ['required', 'integer'],
+            'userToken' => ['required', 'exists:users,token'],
             'content' => ['required', 'string'],
         ];
     }

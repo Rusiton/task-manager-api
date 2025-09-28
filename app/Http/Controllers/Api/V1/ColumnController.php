@@ -80,8 +80,15 @@ class ColumnController extends Controller implements HasMiddleware
     public function destroy(Column $column) {
         Gate::authorize('modify', $column);
 
+        $boardId = $column->board_id;
+        $columnPosition = $column->position;
+
         $column->delete();
 
-        return ['message' => 'Column was deleted successfully'];
+        Column::where('board_id', $boardId)
+                ->where('position', '>', $columnPosition)
+                ->decrement('position');
+
+        return response()->json(['message' => 'Column was deleted successfully']);
     }
 }

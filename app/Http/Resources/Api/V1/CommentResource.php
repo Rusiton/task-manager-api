@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Http\Resources\Auth\V1\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,8 +17,7 @@ class CommentResource extends JsonResource
     {
         return [
             'token' => $this->token,
-            'parentId' => $this->commentable_id,
-            'userId' => $this->user_id,
+            'user' => new UserResource($this->user),
             'content' => $this->content,
         ];
     }

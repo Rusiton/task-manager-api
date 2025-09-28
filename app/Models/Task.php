@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use App\Models\Interfaces\Commentable;
+use App\Traits\HasToken;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Task extends Model implements Commentable
 {
+    use HasToken;
+
     protected $fillable = [
         'column_id',
         'assigned_to',
@@ -34,9 +37,9 @@ class Task extends Model implements Commentable
 
 
 
-    public function assigned_to(): BelongsTo
+    public function assignedTo(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 
 

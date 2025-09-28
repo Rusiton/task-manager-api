@@ -22,7 +22,7 @@ class InviteUserBoardRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'userId' => ['required', 'integer', 'exists:users,id'],
+            'userToken' => ['required', 'exists:users,token'],
             'expiresAt' => ['required', 'date'],
         ];
     }

@@ -22,10 +22,10 @@ class BoardResource extends JsonResource
             'name' => $this->name,
             'slug' => Str::slug($this->name),
             'description' => $this->description,
-            'owner' => new UserResource(User::find($this->owner_id)),
+            'owner' => new UserResource($this->user),
             'admins' => UserResource::collection($this->admins),
             'members' => UserResource::collection($this->users),
-            'lists' => ColumnResource::collection($this->columns),
+            'lists' => ColumnResource::collection($this->columns->sortBy('position')),
         ];
     }
 }
