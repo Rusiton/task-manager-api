@@ -25,23 +25,44 @@ class UpdateTaskRequest extends FormRequest
 
         if ($method == 'PUT') {
             return [
-                'columnToken' => ['required', 'exists:columns,token'],
-                'assignedTo' => ['nullable', 'exists:users,token'],
+                'column_token' => ['required', 'exists:columns,token'],
+                'assigned_to' => ['nullable', 'exists:users,token'],
                 'name' => ['required', 'string'],
                 'description' => ['nullable'],
                 'position' => ['required', 'integer'],
-                'dueDate' => ['nullable', 'date'],
+                'due_date' => ['nullable', 'date'],
             ];
         }
         else {
             return [
-                'columnToken' => ['sometimes', 'required', 'exists:columns,token'],
-                'assignedTo' => ['sometimes', 'nullable', 'exists:users,token'],
+                'column_token' => ['sometimes', 'required', 'exists:columns,token'],
+                'assigned_to' => ['sometimes', 'nullable', 'exists:users,token'],
                 'name' => ['sometimes', 'required', 'string'],
                 'description' => ['sometimes', 'nullable'],
                 'position' => ['sometimes', 'required', 'integer'],
-                'dueDate' => ['sometimes', 'nullable', 'date'],
+                'due_date' => ['sometimes', 'nullable', 'date'],
             ];
+        }
+    }
+
+    protected function prepareForValidation()
+    {
+        if ($this->columnToken) {
+            $this->merge([
+                'column_token' => $this->columnToken
+            ]);
+        }
+
+        if ($this->assignedTo) {
+            $this->merge([
+                'assigned_to' => $this->assignedTo
+            ]);
+        }
+
+        if ($this->dueDate) {
+            $this->merge([
+                'due_date' => $this->dueDate
+            ]);
         }
     }
 }

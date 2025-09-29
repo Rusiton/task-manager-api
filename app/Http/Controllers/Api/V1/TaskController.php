@@ -75,48 +75,43 @@ class TaskController extends Controller implements HasMiddleware
 
         Gate::authorize('modify', [Task::class, $task->column->board]);
 
-        if ($validated['assignedTo']) {
-            $user = User::where('token', $validated['assignedTo'])->first();
-            $validated['assignedTo'] = $user->id; // Replaces user token by user ID
+        if (array_key_exists('assigned_to', $validated)) {
+            $user = User::where('token', $validated['assigned_to'])->first();
+            $validated['assigned_to'] = $user->id; // Replaces user token by user ID
         }
         
-        $column = Column::where('token', $validated['columnToken'])->first();
+        $column = Column::where('token', $validated['column_token'])->first();
 
         $task->update([
-            'column_id' => $column->id,
-            'assigned_to' => $validated['assignedTo'],
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'position' => $validated['position'],
-            'due_date' => $validated['dueDate'],
+            'column_id' => $column->id, 
+            ...$validated,
         ]);
 
-        return new TaskResource($task);
+        return new TaskResource($task->load('column')); // Returns updated task with reloaded relationship.
     }
 
 
 
-    public function swapPositions(Request $request){
+    public function orderPositions(Request $request){
         $validated = $request->validate([
-            'changedTaskToken' => ['required', 'exists:tasks,token'],
-            'replacedTaskToken' => ['required', 'exists:tasks,token'],
+            'columnToken' => ['required', 'exists:columns,token'],
+            'orderedTasksTokens' => ['required', 'array'],
+            'orderedTasksTokens.*' => ['required', 'exists:tasks,token'],
         ]);
 
         DB::transaction(function () use ($validated) {
-            $changedTask = Task::where('token', $validated['changedTaskToken'])->first();
-            $replacedTask = Task::where('token', $validated['replacedTaskToken'])->first();
+            $column = Column::where('token', $validated['columnToken'])->first();
 
-            Gate::authorize('modify', [Task::class, $changedTask->column->board]);
+            $tasks = Task::where('column_id', $column->id)->get();
+            $tempStart = -(10**5); // High temporary position to avoid constraint violation.
 
-            $newPos = $replacedTask->position;
+            foreach ($tasks as $index => $task) {
+                $task->update(['position' => $tempStart + $index]);
+            }
 
-            $changedTask->position = -1; // Temp position to avoid constraint violation.
-            $replacedTask->position = $changedTask->getOriginal('position');
-
-            $changedTask->save(); // Updates position to avoid constraint violation.
-            $replacedTask->save();
-
-            $changedTask->update(['position' => $newPos]);
+            foreach ($validated['orderedTasksTokens'] as $position => $token) {
+                Task::where('token', $token)->update(['position' => $position + 1]); // Updates each task position
+            }
         });
 
         return response()->json([
