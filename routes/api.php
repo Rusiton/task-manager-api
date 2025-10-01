@@ -34,12 +34,11 @@ Route::group(['prefix' => 'v1/auth', 'namespace' => 'App\Http\Controllers\Auth\V
     Route::apiResource('users', UserController::class)->except(['update']);
 
     Route::patch('/users', [UserController::class, 'update']);
-    Route::put('/users', [UserController::class, 'update']);
     
     Route::get('/users/{user}/boards', [UserController::class, 'getBoards']);
     
-    Route::put('/users/profile', [UserController::class, 'updateProfile']);
-    Route::put('/users/settings', [UserController::class, 'updateSettings']);
+    Route::patch('/users/profile', [UserController::class, 'updateProfile']);
+    Route::patch('/users/settings', [UserController::class, 'updateSettings']);
 
     Route::patch('/users/profile', [UserController::class, 'updateProfile']);
     Route::patch('/users/settings', [UserController::class, 'updateSettings']);

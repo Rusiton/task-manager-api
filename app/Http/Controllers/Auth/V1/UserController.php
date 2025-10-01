@@ -63,7 +63,7 @@ class UserController extends Controller implements HasMiddleware
         $user = $request->user();
         $user->profile()->update($validated);
 
-        return new UserResource($user);
+        return new UserResource($user->load('profile'));
     }
 
 
@@ -74,7 +74,7 @@ class UserController extends Controller implements HasMiddleware
         $user = $request->user();
         $user->settings()->update($validated);
 
-        return new UserResource($user);
+        return new UserResource($user->load('settings'));
     }
 
 
