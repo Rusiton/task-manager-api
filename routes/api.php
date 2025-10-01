@@ -31,8 +31,11 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
 
 Route::group(['prefix' => 'v1/auth', 'namespace' => 'App\Http\Controllers\Auth\V1'], function () {
 
-    Route::apiResource('users', UserController::class);
+    Route::apiResource('users', UserController::class)->except(['update']);
 
+    Route::patch('/users', [UserController::class, 'update']);
+    Route::put('/users', [UserController::class, 'update']);
+    
     Route::get('/users/{user}/boards', [UserController::class, 'getBoards']);
     
     Route::put('/users/profile', [UserController::class, 'updateProfile']);
