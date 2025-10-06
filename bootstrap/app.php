@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
+        channels: __DIR__.'/../routes/channels.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -30,4 +31,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (NotFoundHttpException $e, $request) {
             return response()->json(['message' => 'The requested route could not be found.'], 404);
         });
-    })->create();
+    })->withEvents(discover: [
+        __DIR__.'/../app/Listeners',
+    ])->create();
