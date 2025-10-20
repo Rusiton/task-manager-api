@@ -23,6 +23,7 @@ services:
             - sail
         depends_on:
             - mysql
+    
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -48,7 +49,20 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
-        
+    
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        environment:
+          PMA_HOST: mysql
+          PMA_PORT: 3306
+          MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+        ports:
+          - "8080:80"
+        depends_on:
+          - mysql
+        networks:
+          - sail
+    
     soketi:
         container_name: soketi    
         image: 'quay.io/soketi/soketi:latest-16-alpine'

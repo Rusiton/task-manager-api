@@ -18,6 +18,7 @@ class ColumnResource extends JsonResource
 
         return [
             'token' => $this->token,
+            'boardToken' => $this->board->token,
             'name' => $this->name,
             'position' => $this->position,
             'tasks' => TaskResource::collection($this->tasks->sortBy('position')),

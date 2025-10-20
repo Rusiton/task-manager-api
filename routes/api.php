@@ -14,7 +14,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
     Route::get('boards/invitations/{invitationToken}', [BoardController::class, 'showInvitation']);
     Route::get('boards/{boardToken}/invitations', [BoardController::class, 'getBoardInvitations']);
 
-    Route::put('tasks/orderPositions', [TaskController::class, 'orderPositions']);
+    Route::put('tasks/moveInsideColumn', [TaskController::class, 'moveInsideColumn']);
+    Route::put('tasks/moveToColumn', [TaskController::class, 'moveToColumn']);
+    Route::put('tasks/moveToEmptyColumn', [TaskController::class, 'moveToEmptyColumn']);
     
     Route::post('boards/{boardToken}/invitations', [BoardController::class, 'inviteUser']);
     Route::post('boards/invitations/{invitationToken}/accept', [BoardController::class, 'acceptInvitation']);
