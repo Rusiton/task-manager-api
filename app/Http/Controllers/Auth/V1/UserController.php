@@ -7,7 +7,9 @@ use App\Http\Requests\Auth\V1\UpdateUserProfileRequest;
 use App\Http\Requests\Auth\V1\UpdateUserRequest;
 use App\Http\Requests\Auth\V1\UpdateUserSettingsRequest;
 use App\Http\Resources\Api\V1\BoardResource;
+use App\Http\Resources\Api\V1\UserSearchResource;
 use App\Http\Resources\Auth\V1\UserResource;
+use App\Models\Board;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -41,6 +43,42 @@ class UserController extends Controller implements HasMiddleware
         return $user 
             ? new UserResource($user)
             : response()->json(['message' => 'The requested instance could not be found.'], 404);
+    }
+
+
+
+    public function search($searchParam) {
+        $users = User
+        ::where('email', 'like', "%$searchParam%")
+        ->orWhere('name', 'like', "%$searchParam%")
+        ->get();
+
+
+        // Custom parameter to exclude users that are members of some board or have already been invited to that board.
+        $excludeFromBoard = request('excludeFromBoard');
+        if ($excludeFromBoard) {
+            $board = Board::where('token', $excludeFromBoard)->first();
+
+            // Exclude users that are already a member of the board.
+            $users = $users->reject(function ($user) use ($excludeFromBoard) {
+                return 
+                    $user->owned_boards->contains('token', $excludeFromBoard)
+                    || 
+                    $user->joined_boards->contains('token', $excludeFromBoard);
+            });
+
+            // Exclude users that have already been invited to the board.
+            $users = $users->reject(function ($user) use ($board) {
+                $invitationsToBoard = $user->receivedInvitations->filter(function ($invitation) use ($board) {
+                    return $invitation['board_id'] === $board->id;
+                });
+
+                return (count($invitationsToBoard) > 0);
+            });
+        }
+        
+
+        return UserSearchResource::collection($users);
     }
 
 

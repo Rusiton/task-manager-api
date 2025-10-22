@@ -100,7 +100,7 @@ class User extends Authenticatable
 
 
 
-    public function recievedInvitations(): HasMany
+    public function receivedInvitations(): HasMany
     {
         return $this->hasMany(BoardUserInvitation::class);
     }

@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], function () {
+    Route::get('/users/search/{searchParam}', [UserController::class, 'search']);
+
     Route::get('boards/invitations', [BoardController::class, 'getUserInvitations']);
     Route::get('boards/invitations/{invitationToken}', [BoardController::class, 'showInvitation']);
     Route::get('boards/{boardToken}/invitations', [BoardController::class, 'getBoardInvitations']);
@@ -36,7 +38,7 @@ Route::group(['prefix' => 'v1/auth', 'namespace' => 'App\Http\Controllers\Auth\V
     Route::apiResource('users', UserController::class)->except(['update']);
 
     Route::patch('/users', [UserController::class, 'update']);
-    
+
     Route::get('/users/{user}/boards', [UserController::class, 'getBoards']);
     
     Route::patch('/users/profile', [UserController::class, 'updateProfile']);

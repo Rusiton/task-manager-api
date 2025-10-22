@@ -10,6 +10,7 @@ use App\Http\Resources\Api\V1\BoardResource;
 use App\Http\Resources\Api\V1\BoardInvitationResource;
 use App\Models\Board;
 use App\Models\BoardUserInvitation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -103,8 +104,10 @@ class BoardController extends Controller implements HasMiddleware
 
         Gate::authorize('manageInvitations', [BoardUserInvitation::class, $board]);
 
+        $invitedUser = User::where('token', $validated['userToken'])->first();
+
         if(BoardUserInvitation::where('board_id', $board->id)
-            ->where('user_id', $validated['userId'])
+            ->where('user_id', $invitedUser->id)
             ->where('status', 'pending')
             ->where('expires_at', '>', now())
             ->exists())
@@ -117,7 +120,7 @@ class BoardController extends Controller implements HasMiddleware
         Gate::authorize('invite', [BoardUserInvitation::class, $board]);
         
         $expiredOrDeclinedInvitation = BoardUserInvitation::where('board_id', $board->id)
-            ->where('user_id', $validated['userId'])
+            ->where('user_id', $invitedUser->id)
             ->where('status', ['declined', 'expired'])
             ->first();
 
@@ -125,7 +128,7 @@ class BoardController extends Controller implements HasMiddleware
 
         $request->user()->sentInvitations()->create([
             'board_id' => $board->id,
-            'user_id' => $validated['userId'],
+            'user_id' => $invitedUser->id,
             'invited_by' => $request->user()->id,
             'status' => 'pending',
             'expires_at' => $request['expiresAt'],
