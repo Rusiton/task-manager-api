@@ -217,10 +217,10 @@ class BoardController extends Controller implements HasMiddleware
      * Get all the invitations of a board. For invitation management purposes only.
      */
     public function getUserInvitations(Request $request) {
-        $request->query('sent') == 'true' 
-            ? $invitations = $request->user()->sentInvitations
-            : $invitations = $request->user()->recievedInvitations;
-
+        $invitations = $request->query('sent') === 'true' 
+            ? $request->user()->sentInvitations
+            : $request->user()->receivedInvitations;
+        
         return BoardInvitationResource::collection($invitations);
     }
 
