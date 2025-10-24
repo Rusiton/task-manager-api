@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], function () {
-    Route::get('/users/search/{searchParam}', [UserController::class, 'search']);
+    Route::get('users/search/{searchParam}', [UserController::class, 'search']);
 
     Route::get('boards/invitations', [BoardController::class, 'getUserInvitations']);
     Route::get('boards/invitations/{invitationToken}', [BoardController::class, 'showInvitation']);

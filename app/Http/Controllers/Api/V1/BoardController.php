@@ -221,7 +221,11 @@ class BoardController extends Controller implements HasMiddleware
             ? $request->user()->sentInvitations
             : $request->user()->receivedInvitations;
         
-        return BoardInvitationResource::collection($invitations);
+        return BoardInvitationResource::collection(
+            $invitations
+                ->where('status', 'pending')
+                ->where('expires_at', '>', now())
+        );
     }
 
     /**
