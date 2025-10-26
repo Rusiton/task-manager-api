@@ -19,13 +19,15 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
     Route::put('tasks/moveInsideColumn', [TaskController::class, 'moveInsideColumn']);
     Route::put('tasks/moveToColumn', [TaskController::class, 'moveToColumn']);
     Route::put('tasks/moveToEmptyColumn', [TaskController::class, 'moveToEmptyColumn']);
+    Route::put('boards/{boardToken}/members/{userToken}/setRole', [BoardController::class, 'setRole']);
     
     Route::post('boards/{boardToken}/invitations', [BoardController::class, 'inviteUser']);
     Route::post('boards/invitations/{invitationToken}/accept', [BoardController::class, 'acceptInvitation']);
     Route::post('boards/invitations/{invitationToken}/decline', [BoardController::class, 'declineInvitation']);
 
     Route::delete('boards/{boardToken}/invitations/{invitationToken}', [BoardController::class, 'cancelInvitation']);
-    Route::delete('boards/{boardToken}/leave', [BoardController::class, 'leaveBoard']);
+    Route::delete('boards/{boardToken}/user/leave', [BoardController::class, 'leaveBoard']);
+    Route::delete('boards/{boardToken}/members/{userToken}/kick', [BoardController::class, 'kickUser']);
 
     Route::apiResource('boards', BoardController::class);
     Route::apiResource('columns', ColumnController::class);

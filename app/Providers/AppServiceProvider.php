@@ -32,6 +32,11 @@ class AppServiceProvider extends ServiceProvider
                 ->firstOrFail();
         });
 
+        Route::bind('userToken', function ($token) {
+            return \App\Models\User::where('token', $token)
+                ->firstOrFail();
+        });
+
         JsonResource::withoutWrapping();
     }
 }

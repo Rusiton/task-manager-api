@@ -65,13 +65,4 @@ class BoardInvitationPolicy
             ? Response::deny('User already belongs to this board')
             : Response::allow();
     }
-
-
-
-    public function leave(User $user, Board $board)
-    {
-        return $board->users->contains($user)
-            ? Response::allow()
-            : Response::deny('User does not belong to this board');
-    }
 }

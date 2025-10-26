@@ -70,7 +70,7 @@ class UserController extends Controller implements HasMiddleware
             // Exclude users that have already been invited to the board.
             $users = $users->reject(function ($user) use ($board) {
                 $invitationsToBoard = $user->receivedInvitations->filter(function ($invitation) use ($board) {
-                    return $invitation['board_id'] === $board->id;
+                    return $invitation['board_id'] === $board->id && $invitation['status'] === 'pending';
                 });
 
                 return (count($invitationsToBoard) > 0);

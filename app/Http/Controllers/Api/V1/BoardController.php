@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class BoardController extends Controller implements HasMiddleware
 {
@@ -232,14 +233,51 @@ class BoardController extends Controller implements HasMiddleware
      * Leave a board.
      */
     public function leaveBoard(Board $board) {
-        Gate::authorize('leave', [BoardUserInvitation::class, $board]);
+        Gate::authorize('leave', [Board::class, $board]);
+        $user = request()->user();
 
         $board->users()->detach(
-            request()->user()->id
+            $user->id
         );
+
+        BoardUserInvitation
+            ::where('board_id', $board->id)
+            ->where('user_id', $user->id)
+            ->first()
+            ->delete();
 
         return response()->json([
             'message' => 'Left board successfully',
+        ]);
+    }
+
+    public function kickUser(Board $board, User $user) {
+        Gate::authorize('manageMembers', [Board::class, $board]);
+
+        $board->users()->detach(
+            $user->id
+        );
+
+        BoardUserInvitation
+            ::where('board_id', $board->id)
+            ->where('user_id', $user->id)
+            ->first()
+            ->delete();
+
+        return response()->json([
+            'message' => 'Kicked user from board successfully',
+        ]);
+    }
+
+    public function setRole(Board $board, User $user) {
+        Gate::authorize('manageMembers', [Board::class, $board]);
+
+        $validated = request()->validate(['role' => Rule::in(['admin', 'member'])]);
+
+        $board->users()->updateExistingPivot($user->id, $validated);
+
+        return response()->json([
+            'message' => 'Member role updated successfully',
         ]);
     }
 
